@@ -1,0 +1,47 @@
+name: terraform-apply-$(Date:yyyyMMdd).$(Rev:r)
+
+trigger:
+  branches:
+    include:
+      - main
+
+pr: none
+
+variables:
+  terraformVersion: "1.9.8"
+  terraformWorkingDirectory: "infra/environments/dev"
+  azureServiceConnection: "Trainin-Batch-8.18"
+
+pool:
+  name: "Training-Batch-8.18"
+  demands:
+    - Agent.Name -equals Agent-Zein
+
+stages:
+  - stage: ApplyDev
+    displayName: Apply Dev infrastructure
+    jobs:
+      - deployment: TerraformApply
+        displayName: Approved Terraform apply
+        environment: devz
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+
+                - task: TerraformInstaller@1
+                  displayName: Install Terraform
+                  inputs:
+                    terraformVersion: $(terraformVersion)
+
+                - task: AzureCLI@2
+                  displayName: Terraform init and apply
+                  inputs:
+                    azureSubscription: $(azureServiceConnection)
+                    scriptType: ps
+                    scriptLocation: inlineScript
+                    workingDirectory: $(terraformWorkingDirectory)
+                    inlineScript: |
+                      terraform init -input=false
+                      terraform apply -input=false -auto-approve
