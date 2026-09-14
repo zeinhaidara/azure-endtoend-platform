@@ -1,6 +1,20 @@
 api:
   replicaCount: 2
   clientId: ""
+  image:
+    repository: batch818acr.azurecr.io/northbridge-api
+    tag: latest
+  service:
+    port: 80
+  resources:
+    requests: { cpu: 100m, memory: 128Mi }
+    limits: { cpu: 500m, memory: 512Mi }
 worker:
   replicaCount: 2
   clientId: ""
+  image:
+    repository: batch818acr.azurecr.io/northbridge-worker
+    tag: latest
+  resources:
+    requests: { cpu: 100m, memory: 128Mi }
+    limits: { cpu: 500m, memory: 512Mi }
