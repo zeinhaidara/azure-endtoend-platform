@@ -30,6 +30,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: referrals-config
+{{ toYaml .Values.api.resources | nindent 12 }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -54,3 +55,4 @@ spec:
           envFrom:
             - configMapRef:
                 name: referrals-config
+{{ toYaml .Values.worker.resources | nindent 12 }}
