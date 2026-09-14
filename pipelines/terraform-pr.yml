@@ -44,6 +44,8 @@ stages:
               inlineScript: |
                 $env:TF_VAR_subscription_id = "$(subscriptionId)"
                 $env:TF_VAR_tenant_id = "$(tenantId)"
+                $env:TF_VAR_sql_admin_login = "$(sqlAdminLogin)"
+                $env:TF_VAR_sql_admin_password = "$(sqlAdminPassword)"
                 terraform init -input=false
                 terraform validate
 
@@ -68,6 +70,8 @@ stages:
               inlineScript: |
                 $env:TF_VAR_subscription_id = "$(subscriptionId)"
                 $env:TF_VAR_tenant_id = "$(tenantId)"
+                $env:TF_VAR_sql_admin_login = "$(sqlAdminLogin)"
+                $env:TF_VAR_sql_admin_password = "$(sqlAdminPassword)"
                 terraform plan -input=false -out=dev.tfplan
                 terraform show -no-color dev.tfplan > "$(Build.ArtifactStagingDirectory)/dev-plan.txt"
 

@@ -9,3 +9,7 @@ output "storage_account_name" {
 output "referrals_container_name" {
   value = azurerm_storage_container.referrals.name
 }
+
+output "sql_server_id" {
+  value = azurerm_mssql_server.this.id
+}
