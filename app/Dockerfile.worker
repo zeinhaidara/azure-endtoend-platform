@@ -1,0 +1,17 @@
+FROM python:3.13-slim-bookworm AS builder
+WORKDIR /build
+COPY worker/requirements.txt .
+RUN mkdir -p /install && pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+FROM python:3.13-slim-bookworm
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && rm -rf /var/lib/apt/lists/*
+RUN useradd --create-home --uid 10001 appuser
+WORKDIR /app
+COPY --from=builder /install /usr/local
+COPY worker/main.py .
+RUN rm -rf /usr/local/lib/python3.13/site-packages/setuptools* \
+           /usr/local/lib/python3.13/site-packages/pip*
+USER 10001
+CMD ["python", "main.py"]
