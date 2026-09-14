@@ -9,8 +9,9 @@ pr:
       - feature/*
 
 variables:
-  terraformWorkingDirectory: "infra/environments/dev"
-  azureServiceConnection: "Trainin-Batch-8.18"
+- group: AzureIDs
+- name: terraformWorkingDirectory
+  value: "infra/environments/dev"
 
 pool:
   name: "Training-Batch-8.18"
@@ -41,6 +42,8 @@ stages:
               scriptLocation: inlineScript
               workingDirectory: $(terraformWorkingDirectory)
               inlineScript: |
+                $env:TF_VAR_subscription_id = "$(subscriptionId)"
+                $env:TF_VAR_tenant_id = "$(tenantId)"
                 terraform init -input=false
                 terraform validate
 
@@ -63,6 +66,8 @@ stages:
               scriptLocation: inlineScript
               workingDirectory: $(terraformWorkingDirectory)
               inlineScript: |
+                $env:TF_VAR_subscription_id = "$(subscriptionId)"
+                $env:TF_VAR_tenant_id = "$(tenantId)"
                 terraform plan -input=false -out=dev.tfplan
                 terraform show -no-color dev.tfplan > "$(Build.ArtifactStagingDirectory)/dev-plan.txt"
 
