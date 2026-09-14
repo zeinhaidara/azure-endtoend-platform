@@ -2,6 +2,7 @@ locals {
   zones = {
     blob  = "privatelink.blob.core.windows.net"
     vault = "privatelink.vaultcore.azure.net"
+    sql   = "privatelink.database.windows.net"
   }
 }
 

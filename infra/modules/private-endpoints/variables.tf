@@ -29,3 +29,11 @@ variable "key_vault_id" {
 variable "key_vault_dns_zone_id" {
   type = string
 }
+
+variable "sql_server_id" {
+  type = string
+}
+
+variable "sql_dns_zone_id" {
+  type = string
+}

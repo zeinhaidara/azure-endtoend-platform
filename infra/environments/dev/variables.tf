@@ -32,3 +32,14 @@ variable "tenant_id" {
   type        = string
   description = "Microsoft Entra tenant ID supplied by the pipeline."
 }
+
+variable "sql_admin_login" {
+  type        = string
+  description = "SQL administrator login supplied securely by the pipeline."
+}
+
+variable "sql_admin_password" {
+  type        = string
+  sensitive   = true
+  description = "SQL administrator password supplied securely by the pipeline."
+}
