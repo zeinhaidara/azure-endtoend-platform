@@ -100,6 +100,7 @@ stages:
                     install: true
                     waitForExecution: true
                     arguments: >-
+                      --create-namespace
                       --values deploy/helm/referrals/values-dev.yaml
                       --set api.image.repository=$(registry)/northbridge-api
                       --set api.image.tag=$(imageTag)

@@ -45,6 +45,7 @@ coverage/
 test-results/
 *.trx
 *.log
+rendered.yaml
 
 # Local tooling and editor files
 .vscode/
