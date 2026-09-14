@@ -1,6 +1,4 @@
 api:
-  clientId: "REPLACE_WITH_API_MANAGED_IDENTITY_CLIENT_ID" 
+  clientId: "5698a86d-5584-41fe-a3db-5651abce94f8" 
 worker:
-  clientId: "REPLACE_WITH_WORKER_MANAGED_IDENTITY_CLIENT_ID"
-
-#will fill them after app integrated
+  clientId: "fe038604-6f2b-4fb7-a176-098d061ca8f8"

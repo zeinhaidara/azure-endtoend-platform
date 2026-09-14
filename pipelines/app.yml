@@ -1,0 +1,107 @@
+name: northbridge-app-$(Date:yyyyMMdd).$(Rev:r)
+
+trigger:
+  branches:
+    include:
+      - main
+
+pr: none
+
+variables:
+  imageTag: '$(Build.SourceVersion)'
+  registry: 'batch818acr.azurecr.io'
+  dockerConnection: 'service-conn-aks'
+  kubernetesConnection: 'aks-connection'
+  namespace: 'referrals'
+
+pool:
+  name: 'Training-Batch-8.18'
+  demands:
+    - Agent.Name -equals Agent-Zein
+
+stages:
+  - stage: Build
+    displayName: Build, scan, and push images
+    jobs:
+      - job: Containers
+        steps:
+          - checkout: self
+
+          - task: Docker@2
+            displayName: Build API image
+            inputs:
+              command: build
+              containerRegistry: $(dockerConnection)
+              repository: northbridge-api
+              Dockerfile: app/Dockerfile.api
+              buildContext: app
+              tags: |
+                $(imageTag)
+
+          - task: Docker@2
+            displayName: Build worker image
+            inputs:
+              command: build
+              containerRegistry: $(dockerConnection)
+              repository: northbridge-worker
+              Dockerfile: app/Dockerfile.worker
+              buildContext: app
+              tags: |
+                $(imageTag)
+
+          - powershell: |
+              $ErrorActionPreference = 'Stop'
+              if (-not (Get-Command trivy -ErrorAction SilentlyContinue)) {
+                throw 'Trivy is required on Agent-Zein.'
+              }
+              trivy image --ignore-unfixed --severity HIGH,CRITICAL --exit-code 1 "$(registry)/northbridge-api:$(imageTag)"
+              trivy image --ignore-unfixed --severity HIGH,CRITICAL --exit-code 1 "$(registry)/northbridge-worker:$(imageTag)"
+            displayName: Scan images with Trivy
+
+          - task: Docker@2
+            displayName: Push API image
+            inputs:
+              command: push
+              containerRegistry: $(dockerConnection)
+              repository: northbridge-api
+              tags: |
+                $(imageTag)
+
+          - task: Docker@2
+            displayName: Push worker image
+            inputs:
+              command: push
+              containerRegistry: $(dockerConnection)
+              repository: northbridge-worker
+              tags: |
+                $(imageTag)
+
+  - stage: DeployDev
+    displayName: Deploy to Dev
+    dependsOn: Build
+    jobs:
+      - deployment: HelmDeploy
+        environment: devz
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - task: HelmDeploy@0
+                  displayName: Deploy referrals chart
+                  inputs:
+                    connectionType: Kubernetes Service Connection
+                    kubernetesServiceConnection: $(kubernetesConnection)
+                    namespace: $(namespace)
+                    command: upgrade
+                    chartType: FilePath
+                    chartPath: deploy/helm/referrals
+                    releaseName: referrals
+                    install: true
+                    waitForExecution: true
+                    arguments: >-
+                      --values deploy/helm/referrals/values-dev.yaml
+                      --set api.image.repository=$(registry)/northbridge-api
+                      --set api.image.tag=$(imageTag)
+                      --set worker.image.repository=$(registry)/northbridge-worker
+                      --set worker.image.tag=$(imageTag)
