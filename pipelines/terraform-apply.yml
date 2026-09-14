@@ -8,7 +8,6 @@ trigger:
 pr: none
 
 variables:
-  terraformVersion: "1.9.8"
   terraformWorkingDirectory: "infra/environments/dev"
   azureServiceConnection: "Trainin-Batch-8.18"
 
@@ -29,11 +28,6 @@ stages:
             deploy:
               steps:
                 - checkout: self
-
-                - task: TerraformInstaller@1
-                  displayName: Install Terraform
-                  inputs:
-                    terraformVersion: $(terraformVersion)
 
                 - task: AzureCLI@2
                   displayName: Terraform init and apply

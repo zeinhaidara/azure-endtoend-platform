@@ -9,7 +9,6 @@ pr:
       - feature/*
 
 variables:
-  terraformVersion: "1.9.8"
   terraformWorkingDirectory: "infra/environments/dev"
   azureServiceConnection: "Trainin-Batch-8.18"
 
@@ -26,11 +25,6 @@ stages:
         displayName: Format, validate, scan, and plan
         steps:
           - checkout: self
-
-          - task: TerraformInstaller@1
-            displayName: Install Terraform
-            inputs:
-              terraformVersion: $(terraformVersion)
 
           - task: PowerShell@2
             displayName: Terraform format check
