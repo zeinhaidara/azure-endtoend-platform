@@ -51,11 +51,18 @@ stages:
 
           - powershell: |
               $ErrorActionPreference = 'Stop'
-              if (-not (Get-Command trivy -ErrorAction SilentlyContinue)) {
+              $trivyCommand = Get-Command trivy -ErrorAction SilentlyContinue
+              if ($trivyCommand) {
+                $trivy = $trivyCommand.Source
+              } else {
+                $trivy = Get-ChildItem "$env:LOCALAPPDATA\Microsoft\WinGet\Packages" -Recurse -Filter trivy.exe -ErrorAction SilentlyContinue |
+                  Select-Object -First 1 -ExpandProperty FullName
+              }
+              if (-not $trivy) {
                 throw 'Trivy is required on Agent-Zein.'
               }
-              trivy image --ignore-unfixed --severity HIGH,CRITICAL --exit-code 1 "$(registry)/northbridge-api:$(imageTag)"
-              trivy image --ignore-unfixed --severity HIGH,CRITICAL --exit-code 1 "$(registry)/northbridge-worker:$(imageTag)"
+              & $trivy image --ignore-unfixed --severity HIGH,CRITICAL --exit-code 1 "$(registry)/northbridge-api:$(imageTag)"
+              & $trivy image --ignore-unfixed --severity HIGH,CRITICAL --exit-code 1 "$(registry)/northbridge-worker:$(imageTag)"
             displayName: Scan images with Trivy
 
           - task: Docker@2
