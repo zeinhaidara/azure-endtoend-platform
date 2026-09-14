@@ -1,0 +1,6 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: referrals-config
+data:
+  LOG_LEVEL: {{ .Values.config.logLevel | quote }}

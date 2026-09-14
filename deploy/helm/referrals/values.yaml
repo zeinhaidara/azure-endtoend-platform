@@ -18,3 +18,20 @@ worker:
   resources:
     requests: { cpu: 100m, memory: 128Mi }
     limits: { cpu: 500m, memory: 512Mi }
+config:
+  logLevel: info
+hpa:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  cpuUtilization: 70
+pdb:
+  enabled: true
+  minAvailable: 1
+networkPolicy:
+  enabled: true
+ingress:
+  enabled: false
+  className: nginx
+  host: referrals.example.invalid
+  tlsSecretName: referrals-tls
