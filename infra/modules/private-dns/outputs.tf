@@ -5,3 +5,7 @@ output "blob_zone_id" {
 output "vault_zone_id" {
   value = azurerm_private_dns_zone.this["vault"].id
 }
+
+output "sql_zone_id" {
+  value = azurerm_private_dns_zone.this["sql"].id
+}
