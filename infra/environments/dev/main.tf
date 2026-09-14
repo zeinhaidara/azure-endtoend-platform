@@ -50,3 +50,14 @@ module "private_endpoints" {
   sql_server_id         = module.data.sql_server_id
   sql_dns_zone_id       = module.private_dns.sql_zone_id
 }
+
+module "workload_identity" {
+  source              = "../../modules/workload-identity"
+  name_prefix         = "northbridge-dev-zein818"
+  location            = var.location
+  resource_group_name = data.azurerm_resource_group.northbridge.name
+  tenant_id           = var.tenant_id
+  oidc_issuer_url     = data.azurerm_kubernetes_cluster.shared.oidc_issuer_url
+  storage_account_id  = module.data.storage_account_id
+  key_vault_id        = module.key_vault.id
+}
