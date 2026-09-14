@@ -2,3 +2,5 @@ api:
   clientId: "5698a86d-5584-41fe-a3db-5651abce94f8" 
 worker:
   clientId: "fe038604-6f2b-4fb7-a176-098d061ca8f8"
+ingress:
+  enabled: false
