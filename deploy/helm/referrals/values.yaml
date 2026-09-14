@@ -1,5 +1,6 @@
 api:
   replicaCount: 2
+  clientId: ""
 worker:
   replicaCount: 2
-
+  clientId: ""
