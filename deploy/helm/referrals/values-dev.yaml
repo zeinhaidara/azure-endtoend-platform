@@ -1,0 +1,6 @@
+api:
+  clientId: "REPLACE_WITH_API_MANAGED_IDENTITY_CLIENT_ID" 
+worker:
+  clientId: "REPLACE_WITH_WORKER_MANAGED_IDENTITY_CLIENT_ID"
+
+#will fill them after app integrated
