@@ -1,0 +1,78 @@
+name: terraform-pr-$(Date:yyyyMMdd).$(Rev:r)
+
+trigger: none
+
+pr:
+  branches:
+    include:
+      - main
+      - feature/*
+
+variables:
+- group: AzureIDs
+- name: terraformWorkingDirectory
+  value: "infra/environments/dev"
+
+pool:
+  name: "Training-Batch-8.18"
+  demands:
+    - Agent.Name -equals Agent-Zein
+
+stages:
+  - stage: Validate
+    displayName: Validate Terraform
+    jobs:
+      - job: TerraformChecks
+        displayName: Format, validate, scan, and plan
+        steps:
+          - checkout: self
+
+          - task: PowerShell@2
+            displayName: Terraform format check
+            inputs:
+              targetType: inline
+              script: terraform fmt -check -recursive
+              workingDirectory: '$(Build.SourcesDirectory)/$(terraformWorkingDirectory)'
+
+          - task: AzureCLI@2
+            displayName: Terraform init and validate
+            inputs:
+              azureSubscription: $(azureServiceConnection)
+              scriptType: ps
+              scriptLocation: inlineScript
+              workingDirectory: $(terraformWorkingDirectory)
+              inlineScript: |
+                $env:TF_VAR_subscription_id = "$(subscriptionId)"
+                $env:TF_VAR_tenant_id = "$(tenantId)"
+                terraform init -input=false
+                terraform validate
+
+          - task: PowerShell@2
+            displayName: Terraform security scan
+            inputs:
+              targetType: inline
+              script: |
+                if (-not (Get-Command tfsec -ErrorAction SilentlyContinue)) {
+                  Write-Error "tfsec is not installed on Agent-Zein. Install it on the agent or replace this step with the approved scanner."
+                }
+                tfsec . --format lovely
+              workingDirectory: '$(Build.SourcesDirectory)/$(terraformWorkingDirectory)'
+
+          - task: AzureCLI@2
+            displayName: Terraform plan
+            inputs:
+              azureSubscription: $(azureServiceConnection)
+              scriptType: ps
+              scriptLocation: inlineScript
+              workingDirectory: $(terraformWorkingDirectory)
+              inlineScript: |
+                $env:TF_VAR_subscription_id = "$(subscriptionId)"
+                $env:TF_VAR_tenant_id = "$(tenantId)"
+                terraform plan -input=false -out=dev.tfplan
+                terraform show -no-color dev.tfplan > "$(Build.ArtifactStagingDirectory)/dev-plan.txt"
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Terraform plan
+            inputs:
+              targetPath: "$(Build.ArtifactStagingDirectory)/dev-plan.txt"
+              artifact: terraform-plan
