@@ -1,11 +1,17 @@
 name: northbridge-app-$(Date:yyyyMMdd).$(Rev:r)
 
-trigger:
-  branches:
-    include:
-      - main
+trigger: none
 
 pr: none
+
+resources:
+  pipelines:
+    - pipeline: devInfrastructure
+      source: Northbridge-Terraform-DevApply
+      trigger:
+        branches:
+          include:
+            - main
 
 variables:
   imageTag: '$(Build.SourceVersion)'
