@@ -78,20 +78,24 @@ stages:
             displayName: Scan images with Trivy
 
           - task: Docker@2
-            displayName: Push API image
+            displayName: Build and push API image
             inputs:
-              command: push
+              command: buildAndPush
               containerRegistry: $(dockerConnection)
               repository: northbridge-api
+              Dockerfile: app/Dockerfile.api
+              buildContext: app
               tags: |
                 $(imageTag)
 
           - task: Docker@2
-            displayName: Push worker image
+            displayName: Build and push worker image
             inputs:
-              command: push
+              command: buildAndPush
               containerRegistry: $(dockerConnection)
               repository: northbridge-worker
+              Dockerfile: app/Dockerfile.worker
+              buildContext: app
               tags: |
                 $(imageTag)
 
