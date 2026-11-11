@@ -54,3 +54,6 @@ rendered.yaml
 *.swo
 .DS_Store
 Thumbs.db
+__pycache__/
+*.pyc
+memory/

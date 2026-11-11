@@ -18,4 +18,3 @@ HTTPS ingress -> AKS API and worker -> private Storage and database
                               |-> Key Vault via workload identity
                               |-> Log Analytics
 ```
-
